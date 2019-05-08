@@ -5,10 +5,10 @@ def readme():
         return f.read()
 
 setup(name='pyCLAWSps',
-      version       ='0.1',
+      version       ='0.1.3',
       description   ='Python Code for Power Supply Hamamatsu c11204-01/02',
       keywords      ='python hamamatsu power supply c11204',
-      url           ='',
+      url           ='https://github.com/malindasds/pyCLAWSps',
       author        ='Malinda de Silva',
       author_email  ='desilva@mpp.mpg.de',
       license       ='gpl-3.0',
