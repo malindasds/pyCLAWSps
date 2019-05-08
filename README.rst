@@ -2,16 +2,16 @@ pyCLAWSps
 --------
 python script for the Hamamatsu c11204-01/02 power supply
 
-*Installation*
+*Installation
 
 
-*To use*
+*To use
 Simply import module and initialise with commands
 
     >>> import pyCLAWSps
     >>> pyCLAWSps.init()
 
-*Functions*
+*Functions
 
 init():                 Initialise the c11204 power supply. Make sure to connect power supply to the PC before initializing
 printMonitorInfo():     Prints information on the power supply status, voltage and current values
