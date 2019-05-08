@@ -1,4 +1,5 @@
-# pyCLAWSps
+pyCLAWSps
+---------
 
 python script for the Hamamatsu c11204-01/02 power supply for python 3
 
@@ -23,8 +24,9 @@ Tested with only python 3
 ## Using the package
 To use this code simply import module and initialise with commands
 
-  import pyCLAWSps
-  pyCLAWSps.init()
+  >>import pyCLAWSps
+
+  >>pyCLAWSps.init()
 
 ## Functions
 
