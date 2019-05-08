@@ -15,7 +15,9 @@ NOTE -  The applied voltage can be set upto 90 V by c11204 power supply. Change 
 
 Install this package by the following command on a console
 
-  pip install pyCLAWSps
+'''
+pip install pyCLAWSps
+'''
 
 ## Compatibility
 
@@ -24,9 +26,10 @@ Tested with only python 3
 ## Using the package
 To use this code simply import module and initialise with commands
 
-  >>import pyCLAWSps
-
-  >>pyCLAWSps.init()
+'''
+import pyCLAWSps
+pyCLAWSps.init()
+'''
 
 ## Functions
 
@@ -39,5 +42,5 @@ To use this code simply import module and initialise with commands
 * 'setVoltage(voltage_dec)' - Sets the high voltage output to the voltage specified (V)
 * 'getVoltage()'         - Returns power supply voltage in Volts
 * 'getCurrent()'         - Returns power supply current in mA
-* 'printStatus()'        - Prints status information on the power supply (similar to getMonitorInfo()) but without voltage and current values
+* 'printStatus()'        - Prints status information on the power supply (similar to 'getMonitorInfo()') but without voltage and current values
 * 'close()'              - Close serial port
