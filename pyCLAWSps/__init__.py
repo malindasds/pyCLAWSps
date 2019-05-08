@@ -10,6 +10,7 @@ import binascii
 import numpy as np
 
 def init():
+    "Initialise the c11204 power supply. Make sure to connect power supply to the PC before initializing"
     # VARIABLES
     V_conversion=1.812*10**(-3) 	# voltage conversion factor
     I_conversion=4.980*10**(-3)     # current conversion factor (mA)
