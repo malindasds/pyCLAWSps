@@ -49,7 +49,7 @@ class CLAWSps():
         if len(ports) ==0:
             self.logger.warning("Could not find any serial device!")
         for p in ports:
-            if "Silicon Labs CP210" in p[1]:
+            if "CP210" in p[1]:
                 prt = p[0]
         try:
             self.ser = serial.Serial(prt)            # open serial port
@@ -59,7 +59,7 @@ class CLAWSps():
             self.ser.bytesize=serial.EIGHTBITS
             print(self.ser.name)                     # check which port was really used
         except NameError:
-            print("No CP2102 USB to UART Bridge Controller was found. Check USB connection")
+            print("No CP210x Controller was found. Check USB connection")
 
 
     def _convert(self, command):
