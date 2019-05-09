@@ -25,8 +25,8 @@ Using the package
 """""""""""""""""""
 To use this code simply import module and initialise with commands. Make sure to connect power supply to the PC before initializing
 
-    >>> from pyCLAWSps import pyCLAWS
-    >>> ps = pyCLAWS()
+    >>> from pyCLAWSps import CLAWSps
+    >>> ps = CLAWSps()
     >>> ps.printStatus()
 
 Functions
