@@ -49,7 +49,7 @@ class CLAWSps():
         if len(ports) ==0:
             self.logger.warning("Could not find any serial device!")
         for p in ports:
-            if "CP2102 USB to UART Bridge Controller" in p[1]:
+            if "Silicon Labs CP210" in p[1]:
                 prt = p[0]
         try:
             self.ser = serial.Serial(prt)            # open serial port
