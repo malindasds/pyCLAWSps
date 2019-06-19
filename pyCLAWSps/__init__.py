@@ -65,7 +65,6 @@ class CLAWSps():
         except NameError:
             print("No CP210x Controller was found. Check USB connection")
 
-
     def _write(self, command):
         data = command.encode()
         print("command %s encoded %s" % (command, data))
@@ -169,6 +168,19 @@ class CLAWSps():
 
 
     ##### COMMANDS OF POWER SUPPLY ####
+
+    def help(self):
+        print("printMonitorInfo() - Prints information on the power supply status, voltage (V) and current (mA) values")
+        print("getPowerInfo() - Returns the power supply voltage (V) and current (mA) values as tuple")
+        print("setHVOff() - Set power supply High Voltage OFF")
+        print("setHVOn() - Set power supply High Voltage ON")
+        print("reset()  - Reset the power supply")
+        print("setVoltage(voltage_dec) - Sets the high voltage output to the voltage specified (V)")
+        print("getVoltage() - Returns power supply voltage in Volts")
+        print("getCurrent() - Returns power supply current in mA")
+        print("printStatus() - Prints status information on the power supply (similar to getMonitorInfo()) but without voltage and current values")
+        print("close() - Close serial port")
+        print("help() - This help")
 
     def printMonitorInfo(self):
         "Prints information on the power supply status, voltage and current values"
