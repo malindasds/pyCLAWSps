@@ -49,7 +49,10 @@ class CLAWSps():
         if len(ports) ==0:
             self.logger.warning("Could not find any serial device!")
         for p in ports:
+            print("Port %s" % p)
             if "CP210" in p[1]:
+                prt = p[0]
+            elif "Q_MPPC_CTL"  in p[1]:
                 prt = p[0]
         try:
             self.ser = serial.Serial(prt)            # open serial port
@@ -57,6 +60,7 @@ class CLAWSps():
             self.ser.parity = serial.PARITY_EVEN     # set parity
             self.ser.stopbits=serial.STOPBITS_ONE
             self.ser.bytesize=serial.EIGHTBITS
+            self.ser.timeout=2.0
             print(self.ser.name)                     # check which port was really used
         except NameError:
             print("No CP210x Controller was found. Check USB connection")
