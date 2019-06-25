@@ -49,7 +49,10 @@ class CLAWSps():
         if len(ports) ==0:
             self.logger.warning("Could not find any serial device!")
         for p in ports:
+            print("Port %s" % p)
             if "CP210" in p[1]:
+                prt = p[0]
+            elif "Q_MPPC_CTL"  in p[1]:
                 prt = p[0]
         try:
             self.ser = serial.Serial(prt)            # open serial port
@@ -57,10 +60,24 @@ class CLAWSps():
             self.ser.parity = serial.PARITY_EVEN     # set parity
             self.ser.stopbits=serial.STOPBITS_ONE
             self.ser.bytesize=serial.EIGHTBITS
+            self.ser.timeout=2.0
             print(self.ser.name)                     # check which port was really used
         except NameError:
             print("No CP210x Controller was found. Check USB connection")
 
+    def _write(self, command):
+        data = command.encode()
+        print("command %s encoded %s" % (command, data))
+        return(self.ser.write(command.encode()))
+
+    def _read(self, length):
+        rx = self.ser.read(length)
+        if (length == len(rx)) :
+            procd = [c for c in rx]
+            print("rec: %s" % procd)
+        else:
+            print("short read %d vs %d" % (len(rx), length))
+        return rx
 
     def _convert(self, command):
         # Converts command to hex form needed for serial data transfer
@@ -97,38 +114,73 @@ class CLAWSps():
 
     def _checkstatus(self, rx):
         # Status information
-        rx_bin = bin(int(str(rx[4:8])[2:5]))
-        if rx_bin[2] == '0':
-            print("High Voltage Output      :   OFF")
-        else:
+        status = int(rx[4:8])
+        print("Status: %04x" % status)
+        if status & 1:
             print("High Voltage Output      :   ON")
-
-        if rx_bin[3] == '0':
-            print("Over-current protection  :   No")
         else:
-            print("Over-current protection  :   Yes")
+            print("High Voltage Output      :   OFF")
 
-        if rx_bin[4] == '0':
-            print("Current Value            :   Within Specifications")
+        if status & 2:
+            print("Over-current protection  :   Working protection")
         else:
+            print("Over-current protection  :   Not working")
+
+        if status & 4:
             print("Current Value            :   Outside Specifications")
-
-        if rx_bin[5] == '0':
-            print("MPPC temparture sensor   :   Disconnected")
         else:
-            print("MPPC temparture sensor   :   Connected")
+            print("Current Value            :   Within Specifications")
 
-        if rx_bin[6] == '0':
-            print("MPPC temparture sensor   :   Within Specifications")
+        if status & 8:
+            print("MPPC temperature sensor  :   Connected")
         else:
-            print("MPPC temparture sensor   :   Outside Specifications")
+            print("MPPC temperature sensor  :   Disconnected")
 
-        if rx_bin[7] == '0':
-            print("Temperature Correction   :   Invalid")
+        if status & 0x10:
+            print("MPPC temperature sensor  :   Outside Specifications")
         else:
+            print("MPPC temperature sensor  :   Within Specifications")
+
+        if status & 0x40:
             print("Temperature Correction   :   Effectiveness")
+        else:
+            print("Temperature Correction   :   Invalid")
+
+        if status & 0x400:
+            print("Automatic restoration    :   Restoration")
+        else:
+            print("Automatic restoration    :   Not working")
+
+        if status & 0x800:
+            print("Voltage suppression      :   Suppression")
+        else:
+            print("Voltage suppression   :   Not working")
+
+        if status & 0x1000:
+            print("Output voltage control   :   Control")
+        else:
+            print("Output voltage control   :   Not control")
+
+        if status & 0x4000:
+            print("Voltage stability        :   Stable")
+        else:
+            print("Voltage stability        :   Unstable")
+
 
     ##### COMMANDS OF POWER SUPPLY ####
+
+    def help(self):
+        print("printMonitorInfo() - Prints information on the power supply status, voltage (V) and current (mA) values")
+        print("getPowerInfo() - Returns the power supply voltage (V) and current (mA) values as tuple")
+        print("setHVOff() - Set power supply High Voltage OFF")
+        print("setHVOn() - Set power supply High Voltage ON")
+        print("reset()  - Reset the power supply")
+        print("setVoltage(voltage_dec) - Sets the high voltage output to the voltage specified (V)")
+        print("getVoltage() - Returns power supply voltage in Volts")
+        print("getCurrent() - Returns power supply current in mA")
+        print("printStatus() - Prints status information on the power supply (similar to getMonitorInfo()) but without voltage and current values")
+        print("close() - Close serial port")
+        print("help() - This help")
 
     def printMonitorInfo(self):
         "Prints information on the power supply status, voltage and current values"
@@ -140,8 +192,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(28)
+        tx = self._write(command_x.encode())
+        rx = self._read(28)
         if rx[1:4] == b'hpo':
             volt_out = (int(rx[12:16], 16) * self.V_conversion)
             mA_out   = (int(rx[16:20], 16) * self.I_conversion)
@@ -172,8 +224,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(28)
+        tx = self._write(command_x.encode())
+        rx = self._read(28)
         if rx[1:4] == b'hpo':
             volt_out= (int(rx[12:16], 16) * self.V_conversion)
             mA_out = (int(rx[16:20], 16) * self.I_conversion)
@@ -193,8 +245,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hof':
             pass
         elif rx[1:4] == b'hxx':
@@ -212,8 +264,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hon':
             pass
         elif rx[1:4] == b'hxx':
@@ -231,8 +283,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hre':
             pass
         elif rx[1:4] == b'hxx':
@@ -271,8 +323,8 @@ class CLAWSps():
             command_tosend = self.STX + command_str + voltage_str + self.ETX + CS_str + self.CR
             command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
             # print("send command:" + command_x)
-            tx = self.ser.write(command_x.encode())
-            rx = self.ser.read(8)
+            tx = self._write(command_x.encode())
+            rx = self._read(8)
             if rx[1:4] == b'hbv':
                 pass
             elif rx[1:4] == b'hxx':
@@ -297,8 +349,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hgv':
             volt_out= (int(rx[4:8], 16) * self.V_conversion)
             return(volt_out)
@@ -324,8 +376,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hgc':
             I_out= (int(rx[4:8], 16) * self.I_conversion)
             return(I_out)
@@ -344,8 +396,8 @@ class CLAWSps():
         #FINAL COMMAND
         command_tosend = self.STX + command_str + self.ETX + CS_str + self.CR
         command_x =  "".join(chr(int(command_tosend[n : n+2],16)) for n in range(0, len(command_tosend), 2))
-        tx = self.ser.write(command_x.encode())
-        rx = self.ser.read(8)
+        tx = self._write(command_x.encode())
+        rx = self._read(8)
         if rx[1:4] == b'hgs':
             self._checkstatus(rx)
         elif rx[1:4] == b'hxx':
