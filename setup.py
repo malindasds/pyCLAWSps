@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='pyCLAWSps',
-      version       ='0.1.7',
+      version       ='0.1.10',
       description   ='Python Code for Power Supply Hamamatsu c11204-01/02',
       long_description=readme(),
       keywords      ='python hamamatsu power supply c11204',

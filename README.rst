@@ -42,5 +42,6 @@ Functions
 * **getCurrent()**         - Returns power supply current in mA
 * **printStatus()**        - Prints status information on the power supply (similar to 'getMonitorInfo()') but without voltage and current values
 * **close()**              - Close serial port
+* **help()**               - This help
 
 NOTE -  The applied voltage can be set upto 90 V by c11204 power supply. Change the upper voltage limit (*self.V_lim_upper* in **pyCLAWSps/__init__**) as required by the MPPC in use. Default is set to 60 V
