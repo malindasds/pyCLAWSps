@@ -14,7 +14,7 @@ Installation
 
 Install this package by the following command on a console::
 
-  pip install pyCLAWSps
+  pip3 install pyCLAWSps
 
 Compatibility
 """"""""""""""
